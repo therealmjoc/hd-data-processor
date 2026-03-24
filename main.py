@@ -14,8 +14,11 @@ print(unverified)
 
 #print("Search Results for "+searchID+":\n-------")
 
+def flatten_sum(matrix):
+    return sum(matrix, [])
+
 def getFamilyTree(root):
-    output = [root]
+    output = []
 
     parentage = getParentage(root)
     output.append(parentage)
@@ -24,7 +27,22 @@ def getFamilyTree(root):
     for sheep in parentage:
         output.append(getParentage(sheep))
 
+    output = flatten_sum(output)
+
     return output
+
+def checkFamilyTree(tree):
+    for sheep in tree:
+        if not(isPedigree(sheep)):
+            print("Sheep",sheep,"is not pedigree")
+            return False
+    return True
+
+def showFamilyTree(tree):
+    print("-------------\nParentage\n-------------")
+    print("Dam:",tree[0],"Sire:",tree[1])
+    print("-------------\nGrand-Parentage\n-------------")
+    print("Dam:",tree[2],"Sire:",tree[3],"  |  Dam:",tree[4],"Sire:",tree[5])
 
 def getParentage(id):
     return [dam(id),sire(id)]
@@ -37,30 +55,16 @@ def dam(id):
 def sire(id):
     return df.query("NSIS == '"+id+"' or Pedigree_ID == '"+id+"'")["Sire_Pedigree_ID"].iloc[0]
 
-print(getFamilyTree('69W05030'))
+def isPedigree(id):
+    if df.query("NSIS == '"+id+"' or Pedigree_ID == '"+id+"'")["Pedigree_Status"].iloc[0] == "Pedigree":
+        return True
+    else:
+        return False
 
-'''
-print("Target sheep\n-------")
-searchedDf = df.query("NSIS == '"+searchID+"' or Pedigree_ID == '"+searchID+"'")
-print("Pedigree Status: "+searchedDf["Pedigree_Status"].iloc[0])
 
-sireID = searchedDf["Sire_Pedigree_ID"].iloc[0]
-sireDf = df.query("NSIS == '"+sireID+"' or Pedigree_ID == '"+sireID+"'")
-sirePedStatus = sireDf["Pedigree_Status"].iloc[0]
+familyTree = getFamilyTree('')
+print(showFamilyTree(familyTree))
+print("Is this sheep pedigree:",checkFamilyTree(familyTree))
 
-print("-------\nSire\n-------")
-print("Pedigree Status: "+sirePedStatus)
 
-grandSireID = sireDf["Sire_Pedigree_ID"].iloc[0]
-grandSireDf = df.query("NSIS == '"+grandSireID+"' or Pedigree_ID == '"+grandSireID+"'")
-grandSirePedStatus = grandSireDf["Pedigree_Status"].iloc[0]
-
-print("-------\nGrand Sire\n-------")
-print("Pedigree Status: "+grandSirePedStatus)
-
-print("************\nRESULT\n************")
-if (sirePedStatus == "Pedigree" and grandSirePedStatus == "Pedigree"):
-    print("Sheep",searchID,"is Pedigree")
-else:
-    print("Sheep",searchID,"is NOT Pedigree")
-'''
+# sample
