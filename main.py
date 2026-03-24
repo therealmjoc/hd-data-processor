@@ -14,8 +14,20 @@ print(unverified)
 
 #print("Search Results for "+searchID+":\n-------")
 
-def getFamilyTree():
-    return []
+def getFamilyTree(root):
+    output = [root]
+
+    parentage = getParentage(root)
+    output.append(parentage)
+
+
+    for sheep in parentage:
+        output.append(getParentage(sheep))
+
+    return output
+
+def getParentage(id):
+    return [dam(id),sire(id)]
 
 # get dam id
 def dam(id):
@@ -25,6 +37,7 @@ def dam(id):
 def sire(id):
     return df.query("NSIS == '"+id+"' or Pedigree_ID == '"+id+"'")["Sire_Pedigree_ID"].iloc[0]
 
+print(getFamilyTree('69W05030'))
 
 '''
 print("Target sheep\n-------")
